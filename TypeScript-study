@@ -1,0 +1,408 @@
+# TypeScript
+TypeScript-study
+void는 아무것도 반환하지 않는다
+
+const strArr: string[] = ['str', 'str1', 'str2']
+
+const strArr2: Array<string> = ['str', 'str1', 'str2']
+
+const numArr: Array<number> = [1,2,3,4]
+
+const boolArr: boolean[] = [true,false]
+
+let은 재할당 가능해서 string으로 표시됨 let hi = 'hi'에서 let = string라고 나옴
+const는 재할당 불가라서 const hi = 'hi'에서 const = hi라고 나옴
+
+Tuple type
+- 길이 고정 & 인덱스 타입이 고정
+- 여러 다른 타입으로 이루어진 배열을 안전하게 관리
+- 배열 타입의 길이 조절
+const arr: string[] = ['A','B','C']
+
+const tuple: [number,string] = [1, 'A']
+
+const tuple1: (string | number)[] = [1, 'A']
+
+const tuper2: [number, ...string[]] = [0, 'A', 'B']
+
+undefined & null
+
+최대한 사용하지 않는게 좋다
+
+JavaScript에서와 마찬가지로 고유의 특별한 타입으로 인정한다.
+이외에 void, never와 같이 더 세밀한 타입도 제공
+
+const nu: null = null;
+
+const un: undefined = undefined;
+
+any type
+무적이다
+모든 값(타입)의 집합
+사용하지 말자
+noImplicitAny or strict 옵션 true 권장
+
+unknown
+
+새로운 최상위 타입
+any처럼 모든 값을 허용하지만 상대적으로 엄격하다
+TS에서 unknown으로 추론하는 경우는 없으니 개발자가 직접 명시해야함
+assertion 혹은 타입 가드와 함께 사용한다
+타입가드란 이타입이 맞는지 검증하는게 타입가드 이다 if (typeof num === 'string)
+
+function func(x: unknown) {
+    let val: any = x;
+    let val1: unknown = x;
+    let val2: string = x;
+    let val3: boolean = x;
+    let val4: number = x;
+    let val5: string[] = x;
+}
+
+클래스
+- JavaScript에서는 ES2015의 새로운 문법
+- TypeScript에서의 클래스 기능은 C#에서 유래된 것이 많다
+- 일부 기능은 TS에서만 존재하는 고유 문법으로 컴파일 후에 사라진다
+
+class Person {
+    // 필드
+    // - 일종의 속성
+    // - public으로 사용가능하다
+    name: string;
+    age: number;
+    readonly location: string = 'Korea';
+}
+// 인스턴스
+// - 클래스에서 파생된 고유한 것
+// - 실제로 생성된 후 메모리에 올라감
+const p = new Person();
+
+    //생성자
+    // - 초기화를 담당
+    // - 클래스가 인스턴스화 될 때 초기화를 담당하는 소중한친구
+    constructor(name: string, age: number) {
+        this.name = name
+        this.age = age
+    }
+
+
+    //메서드
+    // 객체(클래스)에서는 행동을 뜻한다
+    information(): string {
+        return `${this.name}의 나이는 ${this.age}이다 `
+    }
+
+getter & setter
+
+필드에 접근할 권한을 가진 제어자
+getter O / setter X => 속성은 자동으로 읽기 전용
+setter 매개변수의 타입 X / getter의 반환 타입에서 추론
+private 속성은 .연산자로 접근할 수 없다 그래서 getter setter를 사용한다
+
+class Person {
+    name: string;
+    //private 숨겨진 속성은 _를 사용함
+    private _age: number;
+
+    constructor(name: string, age: number) {
+        this.name = name
+        this._age = age
+    }
+    get age() {
+        if (this._age === 0){
+            return '나이가 설정되지 않았습니다'
+        }
+        return `나이는 ${this._age}세로 추정됩니다 `
+    }
+
+    set age(age) {
+        if (typeof age === 'number'){
+            this._age = age
+        }
+        this._age = 0;
+    }
+}
+
+const p = new Person('jang', 0);
+
+console.log(p.age)
+
+extends
+상속
+확장
+class 기본 {
+    result() {
+        return 'base'
+    }
+}
+
+class 파생 extends 기본 {
+
+}
+
+const de = new 파생()
+
+console.log(de.result())
+
+super
+기본 클래스 호출시 사용
+생성자에서 this 사용 전 호출 되어야함
+class Animal {
+    name: string
+
+    constructor(name:string) {
+        this.name = name
+    }
+
+    sayName() {
+        return `동뭉의 이름은 ${this.name}`
+    }
+}
+
+
+class Person extends Animal {
+    constructor(name : string) {
+        super(name)
+    }
+
+    sayName() {
+        return `${super.sayName()} 사람의 이름은 ${this.name}`
+    }
+}
+
+const person = new Person('jang')
+
+console.log(person.sayName())
+
+접근제어자
+속성과 메서드에 접근을 제한할 수 있다
+클래스 내부 구현 정보를 적당히 공개하여 일부분만 노출시킨다
+API와 비슷한 흉내를 낼 수 있다
+타입 시스템을 이용해 규칙을 강제할 수 있다
+public 어디서나 접근 가능 (기본값)
+protected 해당 클래스와 서브클래스에서만 접근 가능
+private 해당 클래스의 인스턴스에서만 접근 가능
+
+static
+클래스의 속성과 메서드를 new로 인스턴스화 하지 않고 호출할 수 있다
+접근 제어자를 활용할 수 있다
+몇가지 정적 이름을 사용할 수 없다
+- 클래스는 그 자체로 new로 호출할 수 있는 함수이기 때문
+- ex)function.name 내부적으로 bulit in 구성 이미 생성되어있는 것
+
+readonly
+자바스크립트에는 없음
+타입스크립트에서만 있음
+이걸로 안전한 속성을 만들 수 있다
+
+추상 클래스
+abstract를 선언한 클래스로 직접 인스턴스화 될 수 없는 클래스이다
+직접 인스턴스화 될 수 없지만 extends후 파생된 클래스를 인스턴스화하도록 유도한다
+추상 클래스는 구현된 메서드를 포함시킬 수 있다
+abstract선언한 메서드는 파생된 클래스에서 메서드를 구현해야한다
+설계에 목적을 명확하게 가지는 클래스이다
+abstract class Animal {
+    //선언된 메서드
+    abstract hello(): string
+    //구현된 메서드
+    run() {
+        return this.hello() + 'run'
+    }
+}
+
+// 직접 인스턴스가 될 수 없다
+// const animal = new Animal()
+
+class Person extends Animal {
+    hello() {
+        return 'hi'
+    }
+}
+
+const person = new Person()
+console.log(person.run())
+
+Parameter Properties
+class Person {
+    constructor(
+        public name: string,
+        private age : number,
+        protected gender: 'M' | 'f'
+    ) {
+        
+    }
+}
+
+메서드 오버라이딩
+class Animal {
+    run() {
+        return 'Animal이 달리다'
+    }
+}
+
+class Dog extends Animal {
+    run() {
+        return 'Dog이 달리다'
+    }
+}
+
+class Person extends Animal {
+run() {
+        return 'Person이 달리다'
+    }
+}
+
+const p = new Person()
+const d = new Dog()
+console.log(p.run(),d.run())
+
+인터페이스
+jsp에서는 존재하지 않는다
+객체의 타입을 정의하고 생김새를 가지도록 할 수 있다
+TypeScript에서의 클래스 기능은 C#에서 유래도니 것이 많다
+일부 기능은 TS에서만 존재하는 고유 문법으로 컴파일 후에 사라진다
+extends가 아닌 implements 키워드로 구현한다
+interface
+-정의
+-설계
+implements
+- interface의 설계를 구현한다
+
+interface Person {
+    name: string
+    age: number
+}
+
+const jang: Person = {
+    name: 'hi',
+    age: 9
+}
+
+typeof
+jsp에서 이미 존재하는 타입 검사 연산자
+
+function print(value: number | string): string{
+    if(typeof value === 'number'){
+        return String(value)
+    }
+    if(typeof value === 'string'){
+        return value
+    }
+    return value
+}
+
+instanceof
+jsp에서 이미 존재
+instanceof 연산자는 생성자의 prototype 속성이 객체의 프로토타입 체인 어딘가 존재하는지 판별
+function getDate(date: Date | string): Date{
+    if(date instanceof Date){
+        return date
+    }
+
+    return new Date(date)
+}
+
+열거형소개 (Enum)
+의미있는 상수 자료를 정의할수있다(문서화)
+키를 값에 할당하며 순서가 없는 집합이자 자료구조이다
+enum 키워드 + PascalCase 조합으로 생성
+계산된 값을 사용할수있다
+enum Prize{
+    Gold = 100,
+    Silver,
+    Bronze
+}
+
+숫자 열거형 (Enum)
+1씩 증가한다 내가 설정 못함
+
+문자형 열거
+각 멤버의 값을 문자열로 초기화되어야 한다
+숫자형 열거와 동작방식이 다르다
+-값이 자동으로 증가하지 않는다
+-이외에 리버스 매핑의 차이점도 존재
+
+Heterogeneous 열거형 (혼합)
+최대한 사용 하지않는것으로 한다
+
+리버스 매핑
+숫자형 열거 같은 경우 키의 값을 역으로 매핑할 수 있다
+문자형 열거는 지원되지 않음
+enum Order {
+    First = 1,
+    Second = 2,
+    Third = 3
+}
+
+const firstVal = Order.First // 1
+const keyOfFirstVal = Order[firstVal] // first
+
+const 열거
+기본적으로 열거형은 불안전한 접근을 허용한다
+- const enum은 이러한 점을 보완하기 위한 안전한 열거형
+enum 앞에 const 키워드를 명시한다
+컴파일 후 제거되기 때문에 jsp코드를 생성하지 않는다
+
+열거형 활용
+런타임에 존재하는 실제 객체
+keyof, keyof typeof와 조합하여 활용할 수 있다
+const enum Language {
+    TypeScirpt = 'TS',
+    JavaScript = 'JS',
+    Java = 'JAVA',
+    Ruby = 'RB',
+}
+
+const Language2 = {
+    TypeScirpt : 'TS',
+    JavaScript : 'JS',
+    Java : 'JAVA',
+    Ruby : 'RB',
+} as const
+
+
+// type Lang = 'TS' | 'JS'
+// type LangCode = keyof typeof Language
+
+// function getLang(langCode: LangCode){
+//     console.log(langCode)
+// }
+
+// getLang('TypeScirpt')
+
+
+타입 별칭 소개
+의미없는 반복을 줄이고 타입을 명시적으로 사용하도록 돕는다
+let const 를 선언해 변수를 초기화 하듯이 사용할 수 있다
+컴파일러가 따로 추론하지는 않는다
+type str = string
+type num = number
+type arr = num[]
+type func = () => void
+type Person = {
+    name: str
+    age: num
+    counts: arr
+    getInfo: func
+}
+
+interface personInterface{
+    name: str
+    age: num
+    counts: arr
+}
+
+Union 타입 (합집합)
+둘을 합친 결과
+type StringOrNumber = string | number
+| 이게 유니온타입
+
+Intersection 타입 (교집합)
+const obj: Person & Me = {
+    name:'jang'
+    age: 9
+}
+&이게 인터섹션타입
+
+typescript 설정
+tsc --init 이폴더를 기준으로 타입스크립트 환경을 초기화한다
