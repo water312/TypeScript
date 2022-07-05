@@ -6,10 +6,20 @@ interface Todo {
   isDone: boolean;
 }
 
+enum FilterStatus {
+  All = 'all',
+  Completed = 'complete',
+  Active = 'not-complete',
+}
+
+type FilterType = `${FilterStatus}`;
+
 class TodoApp {
+  filterStatus: FilterType;
   todoList: Todo[];
   constructor() {
     this.todoList = [];
+    this.filterStatus = FilterStatus.All;
     this.initEvent();
   }
 
@@ -21,10 +31,10 @@ class TodoApp {
       const [, buttonClass] = button.classList.value.split(' ');
 
       button.addEventListener('click', (event: MouseEventInit) => {
-        const currentTodoList = this.getTodoListByFilter(buttonClass);
+        this.filterStatus = buttonClass as FilterType;
 
         this.toggleFilterStatus(event);
-        this.render(currentTodoList);
+        this.render();
       })
 
     })
@@ -59,34 +69,17 @@ class TodoApp {
 
       target.value = '';
 
-      this.render(this.todoList);
+      this.render();
   }
 
-  /**
-   * 모든 할 일을 조회할 수 있다.
-   * 
-   * @returns {Todo[]} 전체 할일
-   * 
-   */
-  getTodoList() {
-    return this.todoList;
-  }
-
-  /**
-   * 모든 할 일을 필터링하여 조회할 수 있다.
-   * 
-   * @param {string} filterType
-   * 
-   * @returns {Todo[]} 필터링된 할일
-   */
-  getTodoListByFilter(filterType: string) {
-    if(filterType === 'all') {
+  getTodoListByFilter(filterType: FilterType) {
+    if(filterType === FilterStatus.All) {
       return this.todoList;
     }
-    if(filterType === 'complete') {
+    if(filterType === FilterStatus.Completed) {
       return this.todoList.filter(todo => todo.isDone);
     }
-    if(filterType === 'active') {
+    if(filterType === FilterStatus.Active) {
       return this.todoList.filter(todo => !todo.isDone);
     }
   }
@@ -118,7 +111,7 @@ class TodoApp {
     };
 
     this.todoList.splice(selectedIndex, 1, newTodo);
-    this.render(this.todoList);
+    this.render();
   }
 
   updateTodoStatus(selectedId: Todo['id']){
@@ -132,7 +125,7 @@ class TodoApp {
     };
 
     this.todoList.splice(selectedIndex, 1, newTodo)
-    this.render(this.todoList);
+    this.render();
   }
 
   /**
@@ -144,7 +137,7 @@ class TodoApp {
   removeTodo(selectedId: Todo['id']) {
     this.todoList = this.todoList.filter(todo => todo.id !== selectedId);
 
-    this.render(this.todoList);
+    this.render();
   }
 
   generateTodoList(todo: Todo) {
@@ -179,21 +172,25 @@ class TodoApp {
     return containerEl;
   }
 
-  render(todoList: Todo[] = []) {
+  render() {
     const todoListEl = document.querySelector('.todo-items');
     const todoCountEl = <HTMLSpanElement>document.querySelector('#todo-count');
     todoListEl?.replaceChildren();
 
+    const currentTodoList = this.getTodoListByFilter(this.filterStatus);
+
     const fragment = document.createDocumentFragment();
-    const todoListComponent = todoList.map((todo) =>
+    const todoListComponent = this.getTodoListByFilter(this.filterStatus)?.map((todo) =>
      this.generateTodoList(todo),
      );
 
-     fragment.append(...todoListComponent);
-     todoListEl?.appendChild(fragment);
+     if(todoListComponent){
+       fragment.append(...todoListComponent);
+       todoListEl?.appendChild(fragment);
+     }
 
-     if(todoCountEl) {
-       todoCountEl.innerText = String(todoList.length);
+     if(todoCountEl && currentTodoList) {
+       todoCountEl.innerText = String(currentTodoList.length);
      }
 
   }
