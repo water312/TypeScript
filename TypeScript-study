@@ -406,3 +406,194 @@ const obj: Person & Me = {
 
 typescript 설정
 tsc --init 이폴더를 기준으로 타입스크립트 환경을 초기화한다
+
+Jsdoc??
+일반적인 주석들을 활용해서 바로 일종의 문서화를 해주는 기능이다
+
+제네릭소개
+C# 및 Java와 같은 언어에서 널리 사용되는 문법
+대규모 소프트웨어를 구축할 수 있는 가장 유연한 기능을 제공
+<T>와 같은 꺽쇠 괄호를 사용한다
+어렵다
+
+function getInfo<타입 변수 지정>(msg: 타입 인자) : 타입 반환 {
+	return msg
+}
+//제네릭
+
+function getInfo<T>(msg: T): T {
+    return msg
+}
+
+console.log(getInfo<string>('Word'));
+console.log(getInfo<number>(123));
+console.log(getInfo<string[]>(['Word','T']));
+console.log(getInfo<number[]>([1,2,3,4]));
+
+// 함수에서의 제네릭
+
+type TypeGetInfoFunc = <T>(msg:T) => T
+interface InterfaceGetInfoFunc {
+    <T>(msg: T): T;
+}
+
+function getInfo<T>(msg:T):T {
+    return msg
+}
+
+const TypeAliases:TypeGetInfoFunc = getInfo
+const TypeInterface:InterfaceGetInfoFunc = getInfo
+
+function getInfoMultiple<T1,T2>(msg: [T1,T2]): [T1,T2] {
+    return msg
+}
+
+getInfoMultiple<string, number>(['Str',123])
+
+//클래스에서의 제네릭
+
+class Animal<T, U> {
+    name: T
+    genderType : U
+    constructor(name: T, genterType: U) {
+        this.name = name
+        this.genderType = genterType
+    }
+}
+
+type GenderType = 'M' | 'F'
+const dog = new Animal<string,GenderType>('강아지', 'M')
+const cat = new Animal('고양이', 'F')
+
+// 제네릭 타입 좁히기 (extends)
+
+function printMessage<T extends string | number> (msg: T) {
+    return msg
+}
+
+function printArr<T extends string[] | number[]> (msg: T) {
+    return msg.toString()
+}
+
+printMessage('Hello')
+printMessage(123)
+// Error
+// printMessage<string[]>(['H','E','L','L','O'])
+
+printArr(['H','E','L','L','O'])
+printArr([1,2,3,4])
+
+//Error
+//printArr<boolean[]>([true,false])
+
+/**
+ * Index 타입 다루기
+ * Index에 접근하는 모든것들은 타입스크립트에선 쉽지않다
+ */
+
+interface Todo {
+    id: number
+    content: string
+}
+
+//Indexed Access Type
+type TodoId = Todo['id']
+
+interface StrInterface {
+    [index: number]: string
+    name: string
+    age: number
+    // [index: string]: number
+}
+
+const Person: StrInterface = {
+    99: '구구',
+    name: 'cho',
+    age: 99,
+    // genderType: 'M'
+}
+
+/**
+ * 조건부 타입 다루기
+ * 
+ * SomeType extends OtherType ? TrueType : FalseType;
+ * 특이하기때문에 어떻게 활용할 수 있을까 떠오르지 않을수 있다
+ */
+
+interface Person {
+    name: string
+}
+
+interface Me extends Person {
+    age: number
+}
+
+type Ex1 = Me extends Person ? string : number
+
+class Galaxy {
+    type = 'AOS'
+}
+class IPhone {
+    type = 'IOS'
+}
+
+type MyDevice<T> = T extends 'IPhone' ? IPhone : Galaxy
+
+let myPhone: MyDevice<'Galaxy'>
+let myPhone2: MyDevice<'IPhone'>
+let myPhone3: MyDevice<'Xiaomi'>
+
+type IsNumberType = 123 extends number ? true : false
+type IsNumberType2 = number extends 123 ? true : false
+
+const isNumberType: IsNumberType = true
+const isNumberType2: IsNumberType2 = false
+
+/**
+ * (Mapped) 맵드 타입 다루기
+ * 
+ * 기존 타입에서 새로운 다른 타입에서 타입을 정의할 수 있다.
+ * 액세스 서명이나 조건부 타입과 함께 사용할 수 있다.
+ * 
+ * { T in V: T } 이렇게 자주 쓰임
+ * 
+ * 새로운 타입을 새롭게 만들어낼수있다
+ * 이미있는 타입을 새롭게 만들어낼수있다
+ * 새롭게 생각하기
+ * 
+ * 유틸리티타입을 직접 만들때 직접 사용을 하면 깊이 이해할수 있을 것이다
+ * 
+ */
+
+const newNum = [1,2,3].map((num) => num ** 2)
+
+type StringOrNumber = {
+    [key: string]: string | number
+}
+
+const MixedType: StringOrNumber = {
+    one: 'boolean',
+}
+
+type Person = {
+    name: string
+    age: number
+    gender: string
+}
+
+type Dict<T> = {
+    [key: string]: T
+}
+
+const newPerson: Dict<Person> = {}
+newPerson.me
+
+type NewRecord = {
+    [key in 'you' | 'we' | 'me']: Person
+}
+
+function printNewPerson(newPerson: NewRecord) {
+    newPerson.we
+    newPerson.you
+    newPerson.me
+}
