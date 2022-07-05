@@ -1,0 +1,15 @@
+{
+  "name": "ts-todo-list",
+  "version": "1.0.0",
+  "description": "## Create",
+  "main": "index.js",
+  "scripts": {
+    "docs": "jsdoc -c jsdoc.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jsdoc": "^3.6.10"
+  }
+}
